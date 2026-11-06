@@ -1,14 +1,13 @@
-name: CI
-
+name: Hosted runner validation - ci.yml
 on:
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
-
+    branches:
+    - codex/hosted-runner-validation-20261106
+permissions:
+  contents: read
 jobs:
   build:
-    runs-on: ["self-hosted", "ubuntu-latest"]
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -19,8 +18,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version-file: 'package.json'
-        cache: 'pnpm'
+        node-version-file: package.json
+        cache: pnpm
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
