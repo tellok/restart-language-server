@@ -1,38 +1,20 @@
-name: Hosted runner validation - ci.yml
+name: Public repository runner routing verification
 on:
   push:
-    branches:
-    - codex/hosted-runner-validation-20261106
+    branches: [codex/hosted-runner-validation-20261106]
 permissions:
   contents: read
 jobs:
-  build:
+  hosted:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: package.json
-        cache: pnpm
-
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-
-    - name: Run lint
-      run: pnpm run lint
-
-    - name: Compile extension
-      run: pnpm run compile
-
-    - name: Compile tests
-      run: pnpm run compile-tests
-
-      # 如果有测试，可以取消下面的注释
-      # - name: Run tests
-      #   run: xvfb-run -a npm test
+      - run: test "$RUNNER_ENVIRONMENT" = github-hosted
+  opt-in:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 5
+    steps:
+      - run: |
+          test "$RUNNER_ENVIRONMENT" = self-hosted
+          case "$RUNNER_NAME" in github-runner-job-*) ;; *) exit 1 ;; esac
+          uname -m
